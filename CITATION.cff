@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "Spatial Generalization Tests for Machine Learning-based Weather Models to Assess Physical Consistency"
+authors:
+  - family-names: Höver
+    given-names: Maren
+  - family-names: Klöwer
+    given-names: Milan
+  - family-names: Schroeder de Witt
+    given-names: Christian
+  - family-names: Christensen
+    given-names: Hannah M.
+preferred-citation:
+  type: article
+  title: "Spatial Generalization Tests for Machine Learning-based Weather Models to Assess Physical Consistency"
+  authors:
+    - family-names: Höver
+      given-names: Maren
+    - family-names: Klöwer
+      given-names: Milan
+    - family-names: Schroeder de Witt
+      given-names: Christian
+    - family-names: Christensen
+      given-names: Hannah M.
+  url: "https://arxiv.org/abs/2607.20716"
+identifiers:
+  - type: url
+    value: "https://arxiv.org/abs/2607.20716"
+    description: arXiv preprint

@@ -1,0 +1,9 @@
+# Python 3.11 or 3.12. Validated on 3.12; 3.11 verified to resolve.
+# numpy is held at 2.4.4 rather than 2.5.x because 2.5 requires Python
+# >= 3.12, and 3.11 is far more commonly available.
+
+numpy==2.4.4
+xarray==2026.7.0
+matplotlib==3.11.1
+netCDF4==1.7.4
+ipykernel==7.3.0

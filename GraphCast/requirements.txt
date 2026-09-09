@@ -1,0 +1,86 @@
+# GraphCast release environment. Built from the actual imports across all 6
+# release notebooks (not a freeze of the original GraphCast_tests/graphcast_env,
+# which accumulated unused packages over the project). GPU is the default here
+# (unlike NeuralGCM's CPU-only default) since the demo notebook and any
+# REGENERATE_FROM_SCRATCH path run real GraphCast model forward passes, which
+# are heavy on CPU. See the CPU-only fallback at the bottom.
+
+numpy==2.4.4
+scipy==1.17.1
+matplotlib==3.10.8
+Cartopy==0.25.0
+cmocean==4.0.3
+shapely==2.1.2
+xarray==2026.2.0
+netCDF4==1.7.4
+zarr==3.1.6
+gcsfs==2026.3.0
+google-cloud-storage==3.10.1
+ipywidgets==8.1.8
+psutil==7.2.2
+ipykernel==7.2.0
+
+# JAX + CUDA 12 (GPU default). Tested combination: jax/jaxlib 0.4.29, CUDA 12,
+# cuDNN 9.1 (matches the validated env's jaxlib wheel build tag,
+# +cuda12.cudnn91).
+jax[cuda12]==0.4.29
+jaxlib==0.4.29
+
+# JAX-ecosystem packages graphcast's own install_requires pulls in
+# transitively but doesn't pin -- left unpinned, pip resolves latest, which
+# breaks against jax==0.4.29 (confirmed: dm-haiku 0.0.17 calls
+# jax.core.take_current_trace, removed/renamed since 0.4.29 -- AttributeError
+# on import). Pinned here to versions that both work with jax 0.4.29 and
+# resolve cleanly in one `pip install -r requirements.txt` pass.
+#
+# Deliberate deviation from the original GraphCast_tests/graphcast_env, which
+# has chex 0.1.91 + optax 0.2.8 alongside jax 0.4.29: that combination is not
+# installable by pip's resolver (chex 0.1.91 requires jax>=0.7.0, so the dev
+# env must have been built bypassing dependency checks). chex 0.1.90 / optax
+# 0.2.5 are the newest that resolve against jax 0.4.29, and the release
+# notebooks were re-validated end-to-end on them (2026-07-29). dm-haiku is
+# kept at the env's own 0.0.16 -- it declares no jax constraint, so it pins
+# cleanly, and 0.0.17 is the broken one.
+dm-haiku==0.0.16
+chex==0.1.90
+optax==0.2.5
+dm-tree==0.1.9
+jraph==0.0.6.dev0
+
+# torch, GPU build (CUDA 12.4). Only used for one diagnostic
+# `torch.cuda.is_available()` check in prepare_era5_input.ipynb's preserved,
+# provenance-only setup cell -- not on the path to any target figure.
+# Installed via PyTorch's own CUDA 12.4 wheel index.
+--extra-index-url https://download.pytorch.org/whl/cu124
+torch==2.6.0
+
+# GraphCast/GenCast model code. DeepMind renamed/merged this repository --
+# github.com/deepmind/graphcast now redirects to
+# github.com/google-deepmind/weathernext. Installed by pinned commit rather
+# than the notebooks' original floating .../archive/master.zip URL, for
+# reproducibility.
+#
+# Equivalence re-verified 2026-07-29 against the code the notebooks actually
+# ran on -- the local source checkout at GraphCast_tests/graphcast/ (note: the
+# `graphcast 0.14.2` entry in the old GraphCast_tests/graphcast_env is an
+# unrelated PyPI package of the same name, a CSV/SQL-to-graph-database tool,
+# and is not importable there). Of 36 modules, 28 are byte-identical --
+# including graphcast.py, checkpoint.py, autoregressive.py, normalization.py.
+# The 8 that differ are upstream additions that preserve behaviour for this
+# project's usage, checked hunk by hunk:
+#   model_utils.py  - adds an optional edge_normalization_factor=None; when
+#                     None (the only way the identical graphcast.py calls it)
+#                     it takes exactly the previous max-edge-distance path.
+#   data_utils.py   - extracts get_seconds_since_epoch() helper; same maths.
+#   rollout.py      - multi-device (pmap/sharded) paths not used here, plus an
+#                     optimization skipping _get_next_inputs on the final chunk.
+#   xarray_jax.py, denoiser.py, samplers_utils.py, sparse_transformer.py,
+#   xarray_jax_test.py - additive/GenCast-side changes, not on this project's
+#                     single-device GraphCast forecast path.
+graphcast @ https://github.com/google-deepmind/weathernext/archive/08cf73625c9d12bd9aaa038868bcb2fe488f2a22.zip
+
+# --- CPU-only fallback ---
+# Replace the jax/jaxlib/torch block above with:
+#   jax==0.4.29
+#   jaxlib==0.4.29
+#   torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu

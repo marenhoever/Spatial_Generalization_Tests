@@ -1,0 +1,58 @@
+# Data -- never committed, always fetched from Zenodo (see external_data_inventory.md)
+# No trailing slash: during development `data` is a symlink to the staging area on
+# GWS, and git treats a symlink as a file, so `/data/` would not match it and the
+# dangling link would be committed.
+/data
+*.nc
+*.npy
+*.zarr/
+
+# Working notes from building this repository. Kept on disk, not published:
+# they are written for whoever was assembling it, not for a reader of the code.
+# What a reader needs is in README.md and the per-model READMEs.
+/PROGRESS.md
+/inventory.md
+/mistakes_log.md
+/external_data_inventory.md
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.ipynb_checkpoints
+
+# Virtual environments (each model's own env, built locally per its README)
+env/
+venv/
+# uv's interpreters and wheel caches -- setup.sh keeps them here rather than in
+# ~/.local and ~/.cache, so a quota'd home directory can't stop the install.
+.uv/
+*-env/
+*-release-env/
+*.tmp_phase4_validation/
+
+# Julia
+Manifest.toml.bak
+
+# Model checkpoints / large binaries
+*.pkl
+*.ckpt
+*.pt
+*.pth
+
+# SLURM / HPC job logs
+*.out
+*.err
+slurm-*.log
+*_run.log
+
+# OS/editor cruft
+.DS_Store
+*.swp
+
+# Throwaway validation artifacts
+.tmp_*
